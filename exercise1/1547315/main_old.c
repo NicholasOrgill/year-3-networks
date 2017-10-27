@@ -104,10 +104,10 @@ int main(int argc, char **argv) {
         if (strcmp(request[1], "/") == 0) {
             fp = fopen("index.html", "r");
         } else {
-            request[1]++;
+            ++request[1];
             fp = fopen(request[1], "r");
         }
-        if (!fp) {
+        if (fp < 0) {
 
             //file did not open correctly, inform client and close
             fprintf(stderr, "Failed to read file.\n");
@@ -116,8 +116,12 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        printf("All fine.\n");
+
         //everything is fine
-        send(client_socket, ok, strlen(ok), 0);
+        send(client_socket, "HTTP/1.1 200 OK\r\n", strlen(ok), 0);
+        
+        printf("All fine.\n");
         send(client_socket, content_type, strlen(content_type), 0);
 
         //reads file into buffer and send to client until whole file has been sent
