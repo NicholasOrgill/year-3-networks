@@ -17,30 +17,6 @@
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 char buffer[BUFFERLENGTH];
 
-typedef struct {
- char *ext;
- char *mediatype;
-} extn;
-
-//possible media types
-extn media_types[] = {
-	{"gif", "image/gif"},
-	{"txt", "text/plain"},
- 	{"jpg", "image/jpg"},
- 	{"jpeg","image/jpeg"},
- 	{"png", "image/png"},
- 	{"ico", "image/ico"},
- 	{"zip", "image/zip"},
- 	{"gz",  "image/gz"},
- 	{"tar", "image/tar"},
- 	{"htm", "text/html"},
- 	{"html","text/html"},
- 	{"pdfhp", "text/html"},
- 	{"pdf","application/pdf"},
- 	{"zip","application/octet-stream"},
- 	{"rar","application/octet-stream"}
- };
-
 //generic error handler
 void error(char *message) {
 	fprintf(stderr, "%s\n", message);
@@ -56,7 +32,6 @@ void *http_handler_p(void *socket) {
 	char *message;
 	char *status = malloc(sizeof(char*));
 	char *file_extension = malloc(sizeof(char*));
-	//char *media = malloc(sizeof(char*));
 	char c;
 	int client_socket = *(int*)socket;
 	int length_of_file;
@@ -110,16 +85,10 @@ void *http_handler_p(void *socket) {
     strtok(file_extension,".");
     strcpy(file_extension, strtok(NULL, ""));
     file_extension[strlen(file_extension)] = '\0';
-    
 
-    // //determine media type
-    // for (int i = 0; i < 15; i++) {
-    // 	if (strcmp(media_types[i].ext,file_extension) == 0)
-    // 		strcpy(media, media_types[i].mediatype);
-    // }
-	
 
     //write headers
+
     //status code
     write(client_socket, status, strlen(status));
     free(status);
@@ -173,8 +142,6 @@ void *http_handler_p(void *socket) {
 	char *end = "\r\n\r\n";
 	write(client_socket, end, 4);
 	
-	//free(media);
-	printf("done\n");
 	return 0;
 }
 
