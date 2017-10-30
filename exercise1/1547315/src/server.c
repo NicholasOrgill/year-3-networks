@@ -1,5 +1,7 @@
 #include <netinet/in.h>
 
+#include <pthread.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,15 +10,30 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <pthread.h>
-
 #include <unistd.h>
 
 #define BUFFERLENGTH 2048
 
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 char buffer[BUFFERLENGTH];
-
+char *filetypes[16][2] = {
+	{"gif", "image/gif"},
+	{"txt", "text/plain"},
+	{"css", "text/css"},
+	{"jpg", "image/jpg"},
+	{"jpeg","image/jpeg"},
+	{"png", "image/png"},
+	{"ico", "image/ico"},
+	{"zip", "image/zip"},
+	{"gz",  "image/gz"},
+	{"tar", "image/tar"},
+	{"htm", "text/html"},
+	{"html","text/html"},
+	{"php", "text/html"},
+	{"pdf","application/pdf"},
+	{"zip","application/octet-stream"},
+	{"rar","application/octet-stream"}
+};
 //generic error handler
 void error(char *message) {
 	fprintf(stderr, "%s\n", message);
@@ -86,6 +103,13 @@ void *http_handler_p(void *socket) {
     strcpy(file_extension, strtok(NULL, ""));
     file_extension[strlen(file_extension)] = '\0';
 
+    //find correct content type
+    for(int i = 0; i < 16; i++) {
+    	if (strcmp(file_extension, filetypes[i][0]) == 0) {
+    		strcpy(file_extension, filetypes[i][1]);
+    		break;
+    	}
+    }
 
     //write headers
 
